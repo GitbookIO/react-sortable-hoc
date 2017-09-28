@@ -85,3 +85,21 @@ export function provideDisplayName(prefix, Component) {
 
   return componentName ? prefix + '(' + componentName + ')' : prefix;
 }
+
+export function areEqualShallow(a, b) {
+  if (a === b) {
+    return true;
+  }
+
+  for (var key in a) {
+    if (!(key in b) || a[key] !== b[key]) {
+      return false;
+    }
+  }
+  for (var _key2 in b) {
+    if (!(_key2 in a) || a[_key2] !== b[_key2]) {
+      return false;
+    }
+  }
+  return true;
+}

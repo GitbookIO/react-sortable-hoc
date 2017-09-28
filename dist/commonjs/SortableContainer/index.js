@@ -162,6 +162,7 @@ function sortableContainer(WrappedComponent) {
               axis = _this$props3.axis,
               getHelperDimensions = _this$props3.getHelperDimensions,
               helperClass = _this$props3.helperClass,
+              helperStyle = _this$props3.helperStyle,
               hideSortableGhost = _this$props3.hideSortableGhost,
               onSortStart = _this$props3.onSortStart,
               useWindowAsScrollContainer = _this$props3.useWindowAsScrollContainer;
@@ -214,6 +215,12 @@ function sortableContainer(WrappedComponent) {
           });
 
           _this.helper = _this.document.body.appendChild(clonedNode);
+
+          if (helperStyle) {
+            Object.keys(helperStyle).forEach(function (key) {
+              _this.helper.style[key] = helperStyle[key];
+            });
+          }
 
           _this.helper.style.position = 'fixed';
           _this.helper.style.top = _this.boundingClientRect.top - margin.top + 'px';
@@ -294,6 +301,7 @@ function sortableContainer(WrappedComponent) {
 
         // Remove the helper from the DOM
         _this.helper.parentNode.removeChild(_this.helper);
+        _this.helper = null;
 
         if (hideSortableGhost && _this.sortableGhost) {
           _this.sortableGhost.style.visibility = '';
@@ -442,14 +450,45 @@ function sortableContainer(WrappedComponent) {
         }
       }
     }, {
-      key: 'componentWillUnmount',
-      value: function componentWillUnmount() {
+      key: 'componentWillReceiveProps',
+      value: function componentWillReceiveProps(nextProps) {
         var _this3 = this;
 
+        // Update style and class on helper
+        if (this.helper) {
+          if (!(0, _utils.areEqualShallow)(this.props.helperStyle, nextProps.helperStyle)) {
+            Object.keys(nextProps.helperStyle || {}).forEach(function (key) {
+              _this3.helper.style[key] = nextProps.helperStyle[key];
+            });
+            Object.keys(this.props.helperStyle || {}).forEach(function (key) {
+              if (nextProps.helperStyle && nextProps.helperStyle[key]) {
+                return;
+              }
+              _this3.helper.style[key] = null;
+            });
+          }
+
+          if (this.props.helperClass !== nextProps.helperClass) {
+            var _helper$classList2;
+
+            if (nextProps.helperClass) {
+              var _helper$classList;
+
+              (_helper$classList = this.helper.classList).add.apply(_helper$classList, _toConsumableArray(nextProps.helperClass.split(' ')));
+            }
+            (_helper$classList2 = this.helper.classList).remove.apply(_helper$classList2, _toConsumableArray(this.props.helperClass.split(' ')));
+          }
+        }
+      }
+    }, {
+      key: 'componentWillUnmount',
+      value: function componentWillUnmount() {
+        var _this4 = this;
+
         var _loop2 = function _loop2(key) {
-          if (_this3.events.hasOwnProperty(key)) {
+          if (_this4.events.hasOwnProperty(key)) {
             _utils.events[key].forEach(function (eventName) {
-              return _this3.container.removeEventListener(eventName, _this3.events[key]);
+              return _this4.container.removeEventListener(eventName, _this4.events[key]);
             });
           }
         };
@@ -768,6 +807,7 @@ function sortableContainer(WrappedComponent) {
     distance: _propTypes2.default.number,
     lockAxis: _propTypes2.default.string,
     helperClass: _propTypes2.default.string,
+    helperStyle: _propTypes2.default.object,
     transitionDuration: _propTypes2.default.number,
     contentWindow: _propTypes2.default.any,
     onSortStart: _propTypes2.default.func,

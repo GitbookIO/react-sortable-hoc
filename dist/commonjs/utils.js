@@ -9,6 +9,7 @@ exports.closest = closest;
 exports.limit = limit;
 exports.getElementMargin = getElementMargin;
 exports.provideDisplayName = provideDisplayName;
+exports.areEqualShallow = areEqualShallow;
 function arrayMove(arr, previousIndex, newIndex) {
   var array = arr.slice(0);
   if (newIndex >= array.length) {
@@ -94,4 +95,22 @@ function provideDisplayName(prefix, Component) {
   var componentName = Component.displayName || Component.name;
 
   return componentName ? prefix + '(' + componentName + ')' : prefix;
+}
+
+function areEqualShallow(a, b) {
+  if (a === b) {
+    return true;
+  }
+
+  for (var key in a) {
+    if (!(key in b) || a[key] !== b[key]) {
+      return false;
+    }
+  }
+  for (var _key2 in b) {
+    if (!(_key2 in a) || a[_key2] !== b[_key2]) {
+      return false;
+    }
+  }
+  return true;
 }

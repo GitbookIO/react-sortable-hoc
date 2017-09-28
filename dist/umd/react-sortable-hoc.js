@@ -119,6 +119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.limit = limit;
 	exports.getElementMargin = getElementMargin;
 	exports.provideDisplayName = provideDisplayName;
+	exports.areEqualShallow = areEqualShallow;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -207,6 +208,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var componentName = Component.displayName || Component.name;
 
 	  return componentName ? prefix + '(' + componentName + ')' : prefix;
+	}
+
+	function areEqualShallow(a, b) {
+	  if (a === b) {
+	    return true;
+	  }
+
+	  for (var key in a) {
+	    if (!(key in b) || a[key] !== b[key]) {
+	      return false;
+	    }
+	  }
+	  for (var _key2 in b) {
+	    if (!(_key2 in a) || a[_key2] !== b[_key2]) {
+	      return false;
+	    }
+	  }
+	  return true;
 	}
 
 /***/ }),
@@ -741,6 +760,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
+	var _keys = __webpack_require__(3);
+
+	var _keys2 = _interopRequireDefault(_keys);
+
 	var _toConsumableArray2 = __webpack_require__(72);
 
 	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
@@ -909,6 +932,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              axis = _this$props3.axis,
 	              getHelperDimensions = _this$props3.getHelperDimensions,
 	              helperClass = _this$props3.helperClass,
+	              helperStyle = _this$props3.helperStyle,
 	              hideSortableGhost = _this$props3.hideSortableGhost,
 	              onSortStart = _this$props3.onSortStart,
 	              useWindowAsScrollContainer = _this$props3.useWindowAsScrollContainer;
@@ -961,6 +985,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	          });
 
 	          _this.helper = _this.document.body.appendChild(clonedNode);
+
+	          if (helperStyle) {
+	            (0, _keys2.default)(helperStyle).forEach(function (key) {
+	              _this.helper.style[key] = helperStyle[key];
+	            });
+	          }
 
 	          _this.helper.style.position = 'fixed';
 	          _this.helper.style.top = _this.boundingClientRect.top - margin.top + 'px';
@@ -1041,6 +1071,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Remove the helper from the DOM
 	        _this.helper.parentNode.removeChild(_this.helper);
+	        _this.helper = null;
 
 	        if (hideSortableGhost && _this.sortableGhost) {
 	          _this.sortableGhost.style.visibility = '';
@@ -1189,14 +1220,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	    }, {
-	      key: 'componentWillUnmount',
-	      value: function componentWillUnmount() {
+	      key: 'componentWillReceiveProps',
+	      value: function componentWillReceiveProps(nextProps) {
 	        var _this3 = this;
 
+	        // Update style and class on helper
+	        if (this.helper) {
+	          if (!(0, _utils.areEqualShallow)(this.props.helperStyle, nextProps.helperStyle)) {
+	            (0, _keys2.default)(nextProps.helperStyle || {}).forEach(function (key) {
+	              _this3.helper.style[key] = nextProps.helperStyle[key];
+	            });
+	            (0, _keys2.default)(this.props.helperStyle || {}).forEach(function (key) {
+	              if (nextProps.helperStyle && nextProps.helperStyle[key]) {
+	                return;
+	              }
+	              _this3.helper.style[key] = null;
+	            });
+	          }
+
+	          if (this.props.helperClass !== nextProps.helperClass) {
+	            var _helper$classList2;
+
+	            if (nextProps.helperClass) {
+	              var _helper$classList;
+
+	              (_helper$classList = this.helper.classList).add.apply(_helper$classList, (0, _toConsumableArray3.default)(nextProps.helperClass.split(' ')));
+	            }
+	            (_helper$classList2 = this.helper.classList).remove.apply(_helper$classList2, (0, _toConsumableArray3.default)(this.props.helperClass.split(' ')));
+	          }
+	        }
+	      }
+	    }, {
+	      key: 'componentWillUnmount',
+	      value: function componentWillUnmount() {
+	        var _this4 = this;
+
 	        var _loop2 = function _loop2(key) {
-	          if (_this3.events.hasOwnProperty(key)) {
+	          if (_this4.events.hasOwnProperty(key)) {
 	            _utils.events[key].forEach(function (eventName) {
-	              return _this3.container.removeEventListener(eventName, _this3.events[key]);
+	              return _this4.container.removeEventListener(eventName, _this4.events[key]);
 	            });
 	          }
 	        };
@@ -1514,6 +1576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    distance: _propTypes2.default.number,
 	    lockAxis: _propTypes2.default.string,
 	    helperClass: _propTypes2.default.string,
+	    helperStyle: _propTypes2.default.object,
 	    transitionDuration: _propTypes2.default.number,
 	    contentWindow: _propTypes2.default.any,
 	    onSortStart: _propTypes2.default.func,
