@@ -11,6 +11,7 @@ import {
   limit,
   getElementMargin,
   provideDisplayName,
+  areEqualShallow,
   omit,
 } from '../utils';
 
@@ -65,6 +66,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
       distance: PropTypes.number,
       lockAxis: PropTypes.string,
       helperClass: PropTypes.string,
+      helperStyle: PropTypes.object,
       transitionDuration: PropTypes.number,
       contentWindow: PropTypes.any,
       onSortStart: PropTypes.func,
@@ -126,6 +128,30 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           events[key].forEach(eventName =>
             this.container.addEventListener(eventName, this.events[key], false)
           );
+        }
+      }
+    }
+
+    componentWillReceiveProps(nextProps) {
+      // Update style and class on helper
+      if (this.helper) {
+        if (!areEqualShallow(this.props.helperStyle, nextProps.helperStyle)) {
+          Object.keys(nextProps.helperStyle || {}).forEach(key => {
+            this.helper.style[key] = nextProps.helperStyle[key];
+          });
+          Object.keys(this.props.helperStyle || {}).forEach(key => {
+            if (nextProps.helperStyle && nextProps.helperStyle[key]) {
+              return;
+            }
+            this.helper.style[key] = null;
+          });
+        }
+
+        if (this.props.helperClass !== nextProps.helperClass) {
+          if (nextProps.helperClass) {
+            this.helper.classList.add(...nextProps.helperClass.split(' '));
+          }
+          this.helper.classList.remove(...this.props.helperClass.split(' '));
         }
       }
     }
@@ -241,6 +267,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           axis,
           getHelperDimensions,
           helperClass,
+          helperStyle,
           hideSortableGhost,
           onSortStart,
           useWindowAsScrollContainer,
@@ -294,6 +321,12 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
         });
 
         this.helper = this.document.body.appendChild(clonedNode);
+
+        if (helperStyle) {
+          Object.keys(helperStyle).forEach(key => {
+            this.helper.style[key] = helperStyle[key];
+          });
+        }
 
         this.helper.style.position = 'fixed';
         this.helper.style.top = `${this.boundingClientRect.top - margin.top}px`;
@@ -391,6 +424,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 
       // Remove the helper from the DOM
       this.helper.parentNode.removeChild(this.helper);
+      this.helper = null;
 
       if (hideSortableGhost && this.sortableGhost) {
         this.sortableGhost.style.visibility = '';
