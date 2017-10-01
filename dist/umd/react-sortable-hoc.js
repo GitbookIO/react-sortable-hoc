@@ -1517,16 +1517,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          node.style[_utils.vendorPrefix + 'Transform'] = 'translate3d(' + translate.x + 'px,' + translate.y + 'px,0)';
 	        }
 
-	        if (onSortOver && this.newIndex != null && this.newIndex !== prevIndex) {
-	          onSortOver({
-	            newIndex: this.newIndex,
-	            oldIndex: this.index,
-	            collection: this.manager.active.collection
-	          });
-	        }
-
 	        if (this.newIndex == null) {
 	          this.newIndex = this.index;
+	        }
+
+	        if (onSortOver && this.newIndex !== prevIndex) {
+	          onSortOver({
+	            newIndex: this.newIndex,
+	            oldIndex: prevIndex,
+	            index: this.index,
+	            collection: this.manager.active.collection
+	          });
 	        }
 	      }
 	    }, {
