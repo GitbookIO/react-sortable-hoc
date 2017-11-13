@@ -1239,14 +1239,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 
 	          if (this.props.helperClass !== nextProps.helperClass) {
-	            var _helper$classList2;
-
 	            if (nextProps.helperClass) {
 	              var _helper$classList;
 
 	              (_helper$classList = this.helper.classList).add.apply(_helper$classList, (0, _toConsumableArray3.default)(nextProps.helperClass.split(' ')));
 	            }
-	            (_helper$classList2 = this.helper.classList).remove.apply(_helper$classList2, (0, _toConsumableArray3.default)(this.props.helperClass.split(' ')));
+	            if (this.props.helperClass) {
+	              var _helper$classList2;
+
+	              (_helper$classList2 = this.helper.classList).remove.apply(_helper$classList2, (0, _toConsumableArray3.default)(this.props.helperClass.split(' ')));
+	            }
 	          }
 	        }
 	      }
