@@ -152,7 +152,9 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           if (nextProps.helperClass) {
             this.helper.classList.add(...nextProps.helperClass.split(' '));
           }
-          this.helper.classList.remove(...this.props.helperClass.split(' '));
+          if (this.props.helperClass) {
+            this.helper.classList.remove(...this.props.helperClass.split(' '));
+          }
         }
       }
     }
