@@ -441,8 +441,8 @@ export default function sortableContainer(WrappedComponent) {
             });
           }
 
-          var prevHelperClass = this.props.helperClass.split(' ');
-          var newHelperClass = nextProps.helperClass.split(' ');
+          var prevHelperClass = this.props.helperClass.split(' ').filter(Boolean);
+          var newHelperClass = nextProps.helperClass.split(' ').filter(Boolean);
           // Compare prev and next list of helpers
 
           var _listDiff = listDiff(prevHelperClass, newHelperClass),
