@@ -149,8 +149,8 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           });
         }
 
-        const prevHelperClass = this.props.helperClass.split(' ');
-        const newHelperClass = nextProps.helperClass.split(' ');
+        const prevHelperClass = this.props.helperClass.split(' ').filter(Boolean);
+        const newHelperClass = nextProps.helperClass.split(' ').filter(Boolean);
         // Compare prev and next list of helpers
         const { toRemove, toAdd } = listDiff(prevHelperClass, newHelperClass);
 
