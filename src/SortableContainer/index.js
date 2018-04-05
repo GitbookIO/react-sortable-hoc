@@ -13,6 +13,7 @@ import {
   provideDisplayName,
   areEqualShallow,
   omit,
+  listDiff,
 } from '../utils';
 
 // Export Higher Order Sortable Container Component
@@ -148,13 +149,16 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           });
         }
 
-        if (this.props.helperClass !== nextProps.helperClass) {
-          if (nextProps.helperClass) {
-            this.helper.classList.add(...nextProps.helperClass.split(' '));
-          }
-          if (this.props.helperClass) {
-            this.helper.classList.remove(...this.props.helperClass.split(' '));
-          }
+        const prevHelperClass = this.props.helperClass.split(' ');
+        const newHelperClass = nextProps.helperClass.split(' ');
+        // Compare prev and next list of helpers
+        const { toRemove, toAdd } = listDiff(prevHelperClass, newHelperClass);
+
+        // Applied change if it's needed
+        if (toRemove.length > 0) {
+          this.helper.classList.remove(...toRemove);
+        } else if (toAdd.length > 0) {
+          this.helper.classList.add(...toAdd);
         }
       }
     }
