@@ -126,7 +126,6 @@ export function listDiff(prevHelper, newHelper) {
     const before = prevHelper.indexOf(className) !== -1;
     const after = newHelper.indexOf(className) !== -1;
 
-
     if (before && after) {
       return;
     } else if (before && !after) {
@@ -135,5 +134,6 @@ export function listDiff(prevHelper, newHelper) {
       result.toAdd.push(className);
     }
   });
+
   return result;
 }
