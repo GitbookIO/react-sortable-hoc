@@ -13,7 +13,7 @@ import { findDOMNode } from 'react-dom';
 import invariant from 'invariant';
 
 import Manager from '../Manager';
-import { closest, events, vendorPrefix, limit, getElementMargin, provideDisplayName, areEqualShallow, omit } from '../utils';
+import { closest, events, vendorPrefix, limit, getElementMargin, provideDisplayName, areEqualShallow, omit, listDiff } from '../utils';
 
 // Export Higher Order Sortable Container Component
 export default function sortableContainer(WrappedComponent) {
@@ -441,17 +441,25 @@ export default function sortableContainer(WrappedComponent) {
             });
           }
 
-          if (this.props.helperClass !== nextProps.helperClass) {
-            if (nextProps.helperClass) {
-              var _helper$classList;
+          var prevHelperClass = this.props.helperClass.split(' ');
+          var newHelperClass = nextProps.helperClass.split(' ');
+          // Compare prev and next list of helpers
 
-              (_helper$classList = this.helper.classList).add.apply(_helper$classList, _toConsumableArray(nextProps.helperClass.split(' ')));
-            }
-            if (this.props.helperClass) {
-              var _helper$classList2;
+          var _listDiff = listDiff(prevHelperClass, newHelperClass),
+              toRemove = _listDiff.toRemove,
+              toAdd = _listDiff.toAdd;
 
-              (_helper$classList2 = this.helper.classList).remove.apply(_helper$classList2, _toConsumableArray(this.props.helperClass.split(' ')));
-            }
+          // Applied change if it's needed
+
+
+          if (toRemove.length > 0) {
+            var _helper$classList;
+
+            (_helper$classList = this.helper.classList).remove.apply(_helper$classList, _toConsumableArray(toRemove));
+          } else if (toAdd.length > 0) {
+            var _helper$classList2;
+
+            (_helper$classList2 = this.helper.classList).add.apply(_helper$classList2, _toConsumableArray(toAdd));
           }
         }
       }

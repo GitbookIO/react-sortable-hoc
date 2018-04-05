@@ -103,3 +103,42 @@ export function areEqualShallow(a, b) {
   }
   return true;
 }
+/*
+*
+* We use this function for check if the list
+* of prevHelper are different of newHelper list.
+*
+* Return an Object with 2 lists : toAdd and toRemove
+*
+* @param prevHelper : Array = List of prev helpers
+* @param newHelper : Array = List of new helpers
+* @return object : Object with 2 list : one to add and another to remove
+*
+*/
+export function listDiff(prevHelper, newHelper) {
+  var classMap = {};
+  prevHelper.concat(newHelper).forEach(function (className) {
+    classMap[className] = true;
+  });
+
+  var classList = _Object$keys(classMap);
+  var result = {
+    toAdd: [],
+    toRemove: []
+  };
+
+  classList.forEach(function (className) {
+    var before = prevHelper.indexOf(className) !== -1;
+    var after = newHelper.indexOf(className) !== -1;
+
+    if (before && after) {
+      return;
+    } else if (before && !after) {
+      result.toRemove.push(className);
+    } else if (!before && after) {
+      result.toAdd.push(className);
+    }
+  });
+
+  return result;
+}

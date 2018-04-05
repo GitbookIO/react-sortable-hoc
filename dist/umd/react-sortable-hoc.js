@@ -120,6 +120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getElementMargin = getElementMargin;
 	exports.provideDisplayName = provideDisplayName;
 	exports.areEqualShallow = areEqualShallow;
+	exports.listDiff = listDiff;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -226,6 +227,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	  return true;
+	}
+	/*
+	*
+	* We use this function for check if the list
+	* of prevHelper are different of newHelper list.
+	*
+	* Return an Object with 2 lists : toAdd and toRemove
+	*
+	* @param prevHelper : Array = List of prev helpers
+	* @param newHelper : Array = List of new helpers
+	* @return object : Object with 2 list : one to add and another to remove
+	*
+	*/
+	function listDiff(prevHelper, newHelper) {
+	  var classMap = {};
+	  prevHelper.concat(newHelper).forEach(function (className) {
+	    classMap[className] = true;
+	  });
+
+	  var classList = (0, _keys2.default)(classMap);
+	  var result = {
+	    toAdd: [],
+	    toRemove: []
+	  };
+
+	  classList.forEach(function (className) {
+	    var before = prevHelper.indexOf(className) !== -1;
+	    var after = newHelper.indexOf(className) !== -1;
+
+	    if (before && after) {
+	      return;
+	    } else if (before && !after) {
+	      result.toRemove.push(className);
+	    } else if (!before && after) {
+	      result.toAdd.push(className);
+	    }
+	  });
+
+	  return result;
 	}
 
 /***/ }),
@@ -1238,17 +1278,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	          }
 
-	          if (this.props.helperClass !== nextProps.helperClass) {
-	            if (nextProps.helperClass) {
-	              var _helper$classList;
+	          var prevHelperClass = this.props.helperClass.split(' ');
+	          var newHelperClass = nextProps.helperClass.split(' ');
+	          // Compare prev and next list of helpers
 
-	              (_helper$classList = this.helper.classList).add.apply(_helper$classList, (0, _toConsumableArray3.default)(nextProps.helperClass.split(' ')));
-	            }
-	            if (this.props.helperClass) {
-	              var _helper$classList2;
+	          var _listDiff = (0, _utils.listDiff)(prevHelperClass, newHelperClass),
+	              toRemove = _listDiff.toRemove,
+	              toAdd = _listDiff.toAdd;
 
-	              (_helper$classList2 = this.helper.classList).remove.apply(_helper$classList2, (0, _toConsumableArray3.default)(this.props.helperClass.split(' ')));
-	            }
+	          // Applied change if it's needed
+
+
+	          if (toRemove.length > 0) {
+	            var _helper$classList;
+
+	            (_helper$classList = this.helper.classList).remove.apply(_helper$classList, (0, _toConsumableArray3.default)(toRemove));
+	          } else if (toAdd.length > 0) {
+	            var _helper$classList2;
+
+	            (_helper$classList2 = this.helper.classList).add.apply(_helper$classList2, (0, _toConsumableArray3.default)(toAdd));
 	          }
 	        }
 	      }
